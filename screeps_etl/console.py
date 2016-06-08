@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-
+from bs4 import BeautifulSoup
 from datetime import datetime
 from elasticsearch import Elasticsearch
 import getopt
 import screepsapi
 from settings import getSettings
 import sys
+import time
 
 ## Python before 2.7.10 or so has somewhat broken SSL support that throws a warning; suppress it
 import warnings; warnings.filterwarnings('ignore', message='.*true sslcontext object.*')
@@ -19,28 +20,57 @@ class ScreepsConsole(screepsapi.Socket):
         self.subscribe_user('cpu')
 
     def process_log(self, ws, message):
+
+        message_soup = BeautifulSoup(message,  "lxml")
+
         body = {
             'timestamp': datetime.now(),
-            'message': message
+            'mtype': 'log'
         }
-        res = self.es.index(index="screeps-console", doc_type="log", body=body)
+
+        if message_soup.log:
+            tag = message_soup.log
+        elif message_soup.font:
+            tag = message_soup.font
+        else:
+            tag = false
+
+        if tag:
+            for key,elem in tag.attrs.items():
+                if key == 'color':
+                    continue
+                body[key] = elem
+
+        message_text = message_soup.get_text()
+
+        if ':' in message_text:
+            parts = message_text.partition(':')
+            message_text = parts[2]
+
+        message_text.strip()
+        body['message'] = message_text.replace("\t", ' ')
+
+        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
         print res
 
     def process_results(self, ws, message):
         body = {
             'timestamp': datetime.now(),
-            'message': message
+            'message': message,
+            'mtype': 'results'
         }
-        res = self.es.index(index="screeps-console", doc_type="result", body=body)
+        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
         print res
 
 
     def process_error(self, ws, message):
         body = {
             'timestamp': datetime.now(),
-            'message': message
+            'message': message,
+            'mtype': 'error',
+            'severity': 5
         }
-        res = self.es.index(index="screeps-console", doc_type="error", body=body)
+        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
         print res
 
     def process_cpu(self, ws, data):
@@ -50,14 +80,12 @@ class ScreepsConsole(screepsapi.Socket):
 
         if 'cpu' in data:
             body['cpu'] = data['cpu']
-            print data['cpu']
 
         if 'memory' in data:
             body['memory'] = data['memory']
-            print data['memory']
 
         if 'cpu' in data or 'memory' in data:
-            res = self.es.index(index="screeps-performance", doc_type="performance", body=body)
+            res = self.es.index(index="screeps-performance-" + time.strftime("%Y_%d"), doc_type="performance", body=body)
             print res
 
 

@@ -103,3 +103,8 @@ virtualenv env
 source ./env/bin/activate
 yes w | pip install --upgrade -r requirements.txt
 
+
+
+# Setup 'console.sh' in the system path
+echo "** Installing console.sh into System Path **"
+ln -s $DIR/../bin/console.sh /usr/local/bin/console.sh

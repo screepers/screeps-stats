@@ -30,6 +30,7 @@ apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold
 # Install Development Tools
 echo "** Install Development Tools **"
 apt_quiet_install git
+apt_quiet_install iptables-persistent
 apt_quiet_install nodejs
 apt_quiet_install npm
 apt_quiet_install python-dev
@@ -45,6 +46,13 @@ pip install virtualenv
 
 echo "** Install elasticdump **"
 npm install elasticdump -g
+
+
+echo "** Initializing Firewall **"
+mkdir /etc/iptables
+cp -R $DIR/etc/iptables/* /etc/iptables/
+iptables-restore < /etc/iptables/rules.v4
+ip6tables-restore < /etc/iptables/rules.v6
 
 
 # Install Oracle Java

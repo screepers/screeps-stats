@@ -33,7 +33,7 @@ class ScreepsConsole(screepsapi.Socket):
         elif message_soup.font:
             tag = message_soup.font
         else:
-            tag = false
+            tag = False
 
         if tag:
             for key,elem in tag.attrs.items():
@@ -62,7 +62,6 @@ class ScreepsConsole(screepsapi.Socket):
         res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
         print res
 
-
     def process_error(self, ws, message):
         body = {
             'timestamp': datetime.now(),
@@ -89,9 +88,7 @@ class ScreepsConsole(screepsapi.Socket):
             print res
 
 
-
 if __name__ == "__main__":
-
     opts, args = getopt.getopt(sys.argv[1:], "hi:o:",["ifile=","ofile="])
     settings = getSettings()
     screepsconsole = ScreepsConsole(user=settings['screeps_username'], password=settings['screeps_password'], ptr=settings['screeps_ptr'])

@@ -107,8 +107,15 @@ virtualenv env
 source ./env/bin/activate
 yes w | pip install --upgrade -r requirements.txt
 
-
-
 # Setup 'console.sh' in the system path
-echo "** Installing console.sh into System Path **"
-ln -s $DIR/../bin/console.sh /usr/local/bin/console.sh
+echo "** Installing screeps_stats.sh into System Path **"
+ln -s $DIR/../bin/screeps_stats.sh /usr/local/bin/screeps_stats.sh
+
+echo "** Creating screepsstats user **"
+useradd screepsstats --create-home --shell /bin/false -U
+
+if [ ! -f "$DIR/.screeps._settings.yaml" ]; then
+  echo "** Settings Found: Launching Stats Daemon **"
+  screeps_stats.sh start
+fi
+

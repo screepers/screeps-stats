@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P )"
 cd $DIR
 pwd
 
@@ -63,6 +63,7 @@ mkdir /opt/jdk
 tar -zxf jdk-8u92-linux-x64.tar.gz -C /opt/jdk
 update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.0_92/bin/java 100
 update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.0_92/bin/javac 100
+cd $DIR
 
 
 # Install ElasticSearch
@@ -74,17 +75,20 @@ service elasticsearch start
 
 # Install Kibana
 apt_quiet_install kibana
+
 mkdir /etc/kibana
 cp $DIR/kibana.yml /etc/kibana/kibana.yml
 update-rc.d kibana defaults 96 9
+
+echo "** Load Kibana Indexes **"
+$DIR/import_kibana_indexes.sh
 
 echo "** Install Kibana Plugins **"
 /opt/kibana/bin/kibana plugin -i elastic/timelion
 /opt/kibana/bin/kibana plugin -i tagcloud -u https://github.com/stormpython/tagcloud/archive/master.zip
 chown -R kibana:kibana /opt/kibana
 
-echo "** Load Kibana Configuration **"
-./import_dashboards.sh
+echo "** Start Kibana **"
 service kibana start
 
 

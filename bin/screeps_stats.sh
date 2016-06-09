@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Ths wrapper script activated the virtual environment before calling the
+# Ths wrapper script activats the virtual environment before calling the
 # statsrunner.py program. It also makes sure the application is not run as
 # the root user.
 
@@ -18,6 +18,7 @@ cd $DIR
 ENV="$DIR/../env/bin/activate"
 if [ ! -f $ENV ]; then
     echo 'Virtual Environment Not Installed'
+    exit -1
 fi
 
 SCRIPT="$DIR/../screeps_etl/statsrunner.py"

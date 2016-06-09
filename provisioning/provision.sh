@@ -114,7 +114,7 @@ ln -s $DIR/../bin/screeps_stats.sh /usr/local/bin/screeps_stats.sh
 echo "** Creating screepsstats user **"
 useradd screepsstats --create-home --shell /bin/false -U
 
-if [ -f "$DIR/.screeps_settings.yaml" ]; then
+if [ -f "$DIR/../.screeps_settings.yaml" ]; then
   echo "** Settings Found: Launching Stats Daemon **"
   screeps_stats.sh start
 fi

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from console import ScreepsConsole
+from memorystats import ScreepsMemoryStats
+
 from daemon import runner
 import logging
 import multiprocessing
@@ -37,13 +39,18 @@ class App():
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         websocketprocess = False
+        apiprocess = False
         while True:
+
             if not websocketprocess or not websocketprocess.is_alive():
                 websocketprocess = WebsocketProcess()
                 websocketprocess.daemon = True
                 websocketprocess.start()
-                websocketprocess.join()
 
+            if not apiprocess or not apiprocess.is_alive():
+                apiprocess = APIProcess()
+                apiprocess.daemon = True
+                apiprocess.start()
 
 
 
@@ -56,6 +63,21 @@ class WebsocketProcess(multiprocessing.Process):
         settings = getSettings()
         screepsconsole = ScreepsConsole(user=settings['screeps_username'], password=settings['screeps_password'], ptr=settings['screeps_ptr'])
         screepsconsole.start()
+
+
+class APIProcess(multiprocessing.Process):
+
+    def run(self):
+        logging.basicConfig(level=logging.WARN)
+        logger = logging.getLogger("ScreepsStats")
+        logger.setLevel(logging.WARN)
+        settings = getSettings()
+        screepsapi = ScreepsMemoryStats(u=settings['screeps_username'], p=settings['screeps_password'], ptr=settings['screeps_ptr'])
+        screepsapi.run_forever()
+
+
+
+
 
 if __name__ == "__main__":
     app = App()

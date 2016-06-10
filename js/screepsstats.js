@@ -51,11 +51,10 @@ ScreepsStats.prototype.addStat = function (key, value) {
   _.merge(start = Memory.___screeps_stats[Game.time], tmp)
 }
 
-
 ScreepsStats.prototype.runBuiltinStats = function () {
 
   stats = {}
-  stats.time = new Date().toString()
+  stats.time = new Date().toISOString()
   stats.tick = Game.time
 
   stats['cpu'] = {
@@ -71,7 +70,9 @@ ScreepsStats.prototype.runBuiltinStats = function () {
   }
 
   if(!stats['rooms']) {
-    stats['rooms'] = {}
+    stats['rooms'] = {
+      'subgroups': true
+    }
   }
 
 
@@ -159,9 +160,6 @@ ScreepsStats.prototype.runBuiltinStats = function () {
   Memory.___screeps_stats[Game.time] = stats
 }
 
-
-
-
 ScreepsStats.prototype.roomExpensive = function (stats, room) {
 
   var roomName = room.name
@@ -206,7 +204,6 @@ ScreepsStats.prototype.roomExpensive = function (stats, room) {
   stats['rooms'][roomName]['creeps'] = room.find(FIND_MY_CREEPS).length
 }
 
-
 ScreepsStats.prototype.removeTick = function (tick) {
   if(!!Memory.___screeps_stats[tick]) {
     delete Memory.___screeps_stats[tick]
@@ -228,7 +225,5 @@ ScreepsStats.prototype.getStatsForTick = function (tick) {
     return Memory.__screeps_stats[tick]
   }
 }
-
-
 
 module.exports = ScreepsStats

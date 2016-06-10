@@ -11,6 +11,7 @@ from settings import getSettings
 import signal
 import lockfile
 import threading
+import time
 
 
 base_directory = '/tmp/screepsstats'
@@ -52,6 +53,7 @@ class App():
                 apiprocess.daemon = True
                 apiprocess.start()
 
+            time.sleep(3)
 
 
 class WebsocketProcess(multiprocessing.Process):

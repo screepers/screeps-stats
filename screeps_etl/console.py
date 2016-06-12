@@ -39,6 +39,20 @@ class ScreepsConsole(screepsapi.Socket):
             for key,elem in tag.attrs.items():
                 if key == 'color':
                     continue
+
+                # If it's an integer convert it from string
+                if elem.isdigit():
+                    body[key] = int(elem)
+                    continue
+
+                # Check to see if it is a float
+                try:
+                    newelem = float(elem)
+                    body[key] = newelem
+                except ValueError:
+                    pass
+
+                # Okay fine it's a string
                 body[key] = elem
 
         message_text = message_soup.get_text()

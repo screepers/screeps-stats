@@ -52,11 +52,11 @@ class ScreepsMemoryStats():
                             continue
 
                         statdata[group] = subgroup
-                        statdata['tick'] = tick
+                        statdata['tick'] = int(tick)
                         statdata['timestamp'] = tickstats['time']
                         res = self.es.index(index=indexname, doc_type="stats", body=statdata)
                 else:
-                    groupstats['tick'] = tick
+                    groupstats['tick'] = int(tick)
                     groupstats['timestamp'] = tickstats['time']
                     res = self.es.index(index=indexname, doc_type="stats", body=groupstats)
             confirm_queue.append(tick)

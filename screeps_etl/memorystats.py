@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from elasticsearch import Elasticsearch
+import json
 import screepsapi
 from settings import getSettings
 import six
@@ -50,27 +51,22 @@ class ScreepsMemoryStats():
                             continue
 
                         statdata[group] = subgroup
-                        statdata['tick'] = tickstats['tick']
+                        statdata['tick'] = tick
                         statdata['timestamp'] = tickstats['time']
                         res = self.es.index(index=indexname, doc_type="stats", body=statdata)
                         print res
                 else:
-                    groupstats['tick'] = tickstats['tick']
+                    groupstats['tick'] = tick
                     groupstats['timestamp'] = tickstats['time']
                     res = self.es.index(index=indexname, doc_type="stats", body=groupstats)
                     print res
 
-                self.confirm(tick)
+        self.confirm(confirm_queue)
 
-    def confirm(self, tick):
-
-        if isinstance(tick, six.string_types):
-            tick = int(tick)
-
-        if (isinstance( tick, int)) or (isinstance( tick, long)):
-            sconn = self.getScreepsAPI()
-            javascript_clear = 'Stats.removeTick(' + str(tick) + ');'
-            sconn.console(javascript_clear)
+    def confirm(self, ticks):
+        javascript_clear = 'Stats.removeTick(' + json.dumps(ticks, separators=(',',':')) + ');'
+        sconn = self.getScreepsAPI()
+        sconn.console(javascript_clear)
 
 
 if __name__ == "__main__":

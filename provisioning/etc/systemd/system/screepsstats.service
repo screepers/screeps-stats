@@ -1,0 +1,16 @@
+[Unit]
+Description=Screeps Statistics Collection
+After=network-online.target
+
+[Service]
+Type=simple
+User=screepsstats
+Group=screepsstats
+WorkingDirectory=/home/screepsstats/
+ExecStart=/usr/local/bin/screepsstats
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

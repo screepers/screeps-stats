@@ -9,7 +9,7 @@ all: dependencies
 
 fresh: fulluninstall dependencies
 
-fulluninstall: uninstall removedeps
+fulluninstall: uninstall cleancode
 
 install:
 	# Create link in /usr/local/bin to screeps stats program.
@@ -53,8 +53,12 @@ uninstall:
 		rm /etc/systemd/system/screepsstats.service; \
 	fi;
 
-removedeps:
+cleancode:
 	# Remove existing environment
 	if [ -d $(ROOT_DIR)/env ]; then \
 		rm -rf $(ROOT_DIR)/env; \
+	fi;
+	# Remove compiled python files
+	if [ -d $(ROOT_DIR)/screep_etl ]; then \
+		rm -f $(ROOT_DIR)/screep_etl/*.pyc; \
 	fi;

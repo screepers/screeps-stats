@@ -63,9 +63,7 @@ class ScreepsConsole(screepsapi.Socket):
 
         message_text.strip()
         body['message'] = message_text.replace("\t", ' ')
-
         res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
-        print res
 
     def process_results(self, ws, message):
         body = {
@@ -74,7 +72,6 @@ class ScreepsConsole(screepsapi.Socket):
             'mtype': 'results'
         }
         res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
-        print res
 
     def process_error(self, ws, message):
         body = {
@@ -84,7 +81,6 @@ class ScreepsConsole(screepsapi.Socket):
             'severity': 5
         }
         res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
-        print res
 
     def process_cpu(self, ws, data):
         body = {
@@ -99,7 +95,6 @@ class ScreepsConsole(screepsapi.Socket):
 
         if 'cpu' in data or 'memory' in data:
             res = self.es.index(index="screeps-performance-" + time.strftime("%Y_%d"), doc_type="performance", body=body)
-            print res
 
 
 if __name__ == "__main__":

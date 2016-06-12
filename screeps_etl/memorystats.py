@@ -38,6 +38,7 @@ class ScreepsMemoryStats():
         # stats[tick][group][subgroup][data]
         # stats[4233][rooms][W43S94] = {}
         date_index = time.strftime("%Y_%d")
+        confirm_queue =[]
         for tick,tickstats in stats['data'].items():
             for group,groupstats in tickstats.items():
 
@@ -54,12 +55,11 @@ class ScreepsMemoryStats():
                         statdata['tick'] = tick
                         statdata['timestamp'] = tickstats['time']
                         res = self.es.index(index=indexname, doc_type="stats", body=statdata)
-                        print res
                 else:
                     groupstats['tick'] = tick
                     groupstats['timestamp'] = tickstats['time']
                     res = self.es.index(index=indexname, doc_type="stats", body=groupstats)
-                    print res
+            confirm_queue.append(tick)
 
         self.confirm(confirm_queue)
 

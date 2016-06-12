@@ -250,7 +250,7 @@ ScreepsStats.prototype.roomExpensive = function (stats, room) {
   stats['rooms'][roomName]['hostiles'] = {}
   for(var hostile_index in hostiles){
     var hostile = hostiles[hostile_index]
-    if(!stats[roomName]['hostiles'][hostile.owner.username]) {
+    if(!stats['rooms'][roomName]['hostiles'][hostile.owner.username]) {
       stats['rooms'][roomName]['hostiles'][hostile.owner.username] = 1
     } else {
       stats['rooms'][roomName]['hostiles'][hostile.owner.username]++

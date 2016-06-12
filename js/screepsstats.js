@@ -117,20 +117,37 @@ ScreepsStats.prototype.runBuiltinStats = function () {
         stats['rooms'][roomName]['energyAvailable'] = room.energyCapacityAvailable
 
         if(room.storage) {
-          stats['rooms'][roomName]['storage'] = {}
-          stats['rooms'][roomName]['storage'].store = _.sum(room.storage.store)
-          stats['rooms'][roomName]['storage']['resources'] = {}
+          if(!stats['storage']) {
+            stats['storage'] = {
+              'subgroups': true
+            }
+          }
+
+          stats['storage'][room.terminal.id] = {}
+          stats['storage'][room.terminal.id].room = room.name
+          stats['storage'][room.terminal.id].store = _.sum(room.storage.store)
+          stats['storage'][room.terminal.id]['resources'] = {}
           for(var resourceType in room.storage.store) {
-            stats['rooms'][roomName]['storage']['resources'][resourceType] = room.storage.store[resourceType]
+            stats['storage'][room.terminal.id]['resources'][resourceType] = room.storage.store[resourceType]
+            stats['storage'][room.terminal.id][resourceType] = room.storage.store[resourceType]
           }
         }
 
         if(room.terminal) {
-          stats['rooms'][roomName]['terminal'] = {}
-          stats['rooms'][roomName]['terminal'].store = _.sum(room.terminal.store)
-          stats['rooms'][roomName]['terminal']['resources'] = {}
+
+          if(!stats['terminal']) {
+            stats['terminal'] = {
+              'subgroups': true
+            }
+          }
+
+          stats['terminal'][room.terminal.id] = {}
+          stats['terminal'][room.terminal.id].room = room.name
+          stats['terminal'][room.terminal.id].store = _.sum(room.terminal.store)
+          stats['terminal'][room.terminal.id]['resources'] = {}
           for(var resourceType in room.terminal.store) {
-            stats['rooms'][roomName]['terminal']['resources'][resourceType] = room.terminal.store[resourceType]
+            stats['terminal'][room.terminal.id]['resources'][resourceType] = room.terminal.store[resourceType]
+            stats['terminal'][room.terminal.id][resourceType] = room.terminal.store[resourceType]
           }
         }
       }
@@ -139,21 +156,22 @@ ScreepsStats.prototype.runBuiltinStats = function () {
     this.roomExpensive(stats,room)
   }
 
+  if(!stats['spawns']) {
+    stats['spawns'] = {
+      'subgroups': true
+    }
+  }
+
   for(var i in Game.spawns) {
     var spawn = Game.spawns[i]
-    var roomName = spawn.room.name
-
-    if(!stats['rooms'][roomName]['spawns']) {
-      stats['rooms'][roomName]['spawns'] = {}
-    }
-
-    stats['rooms'][roomName]['spawns'][spawn.name] = {}
+    stats['spawns'][spawn.name] = {}
+    stats['spawns'][spawn.name].room = spawn.room.name
     if(!!spawn.spawning) {
-      stats['rooms'][roomName]['spawns'][spawn.name].busy = true
-      stats['rooms'][roomName]['spawns'][spawn.name].remainingTime = spawn.spawning.remainingTime
+      stats['spawns'][spawn.name].busy = true
+      stats['spawns'][spawn.name].remainingTime = spawn.spawning.remainingTime
     } else {
-      stats['rooms'][roomName]['spawns'][spawn.name].busy = false
-      stats['rooms'][roomName]['spawns'][spawn.name].remainingTime = 0
+      stats['spawns'][spawn.name].busy = false
+      stats['spawns'][spawn.name].remainingTime = 0
     }
   }
 
@@ -166,14 +184,49 @@ ScreepsStats.prototype.roomExpensive = function (stats, room) {
 
 
   // Source Mining
+
+  if(!stats['sources']) {
+    stats['sources'] = {
+      'subgroups': true
+    }
+  }
+
+  if(!stats['minerals']) {
+    stats['minerals'] = {
+      'subgroups': true
+    }
+  }
+
+  stats['rooms'][roomName].spawnEnergy = 0
+  stats['rooms'][roomName].spawnEnergyMax = 0
+
+  stats['rooms'][roomName].mineral = 0
+  stats['rooms'][roomName].mineralCapacity = 0
+
+
+
   var sources = room.find(FIND_SOURCES)
   stats['rooms'][roomName]['sources'] = {}
   for(var source_index in sources) {
     var source = sources[source_index]
-    stats['rooms'][roomName]['sources'][source.id] = {}
-    stats['rooms'][roomName]['sources'][source.id].energy = source.energy
-    stats['rooms'][roomName]['sources'][source.id].energyCapacity = source.energyCapacity
-    stats['rooms'][roomName]['sources'][source.id].ticksToRegeneration = source.ticksToRegeneration
+    stats['sources'][source.id] = {}
+    stats['sources'][source.id].room = roomName
+    stats['sources'][source.id].energy = source.energy
+    stats['sources'][source.id].energyCapacity = source.energyCapacity
+    stats['sources'][source.id].ticksToRegeneration = source.ticksToRegeneration
+
+    if(source.energy < source.energyCapacity && source.ticksToRegeneration) {
+      var energyHarvested = source.energyCapacity - source.energy
+      if(source.ticksToRegeneration < ENERGY_REGEN_TIME) {
+        var ticksHarvested = ENERGY_REGEN_TIME - source.ticksToRegeneration
+        stats['sources'][source.id].averageHarvest = energyHarvested / ticksHarvested
+      }
+    } else {
+      stats['sources'][source.id].averageHarvest = 0
+    }
+
+    stats['rooms'][roomName].energy += source.energy
+    stats['rooms'][roomName].energyCapacity += source.energyCapacity
   }
 
   // Mineral Mining
@@ -181,10 +234,14 @@ ScreepsStats.prototype.roomExpensive = function (stats, room) {
   stats['rooms'][roomName]['minerals'] = {}
   for(var minerals_index in minerals) {
     var mineral = minerals[minerals_index]
-    stats['rooms'][roomName]['minerals'][mineral.id] = {}
-    stats['rooms'][roomName]['minerals'][mineral.id].mineralType = mineral.mineralType
-    stats['rooms'][roomName]['minerals'][mineral.id].mineralAmount = mineral.mineralAmount
-    stats['rooms'][roomName]['minerals'][mineral.id].ticksToRegeneration = mineral.ticksToRegeneration
+    stats['minerals'][mineral.id] = {}
+    stats['minerals'][mineral.id].room = roomName
+    stats['minerals'][mineral.id].mineralType = mineral.mineralType
+    stats['minerals'][mineral.id].mineralAmount = mineral.mineralAmount
+    stats['minerals'][mineral.id].ticksToRegeneration = mineral.ticksToRegeneration
+
+    stats['rooms'][roomName].mineralAmount += mineral.mineralAmount
+    stats['rooms'][roomName].mineralType += mineral.mineralType
   }
 
 

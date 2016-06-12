@@ -14,4 +14,10 @@ echo "net.ipv6.conf.default.disable_ipv6 = 1" | tee -a /etc/sysctl.conf
 echo "net.ipv6.conf.lo.disable_ipv6 = 1" | tee -a /etc/sysctl.conf
 sysctl -p
 
+echo "** Initializing Firewall **"
+mkdir /etc/iptables
+cp -R $DIR/etc/iptables/* /etc/iptables/
+iptables-restore < /etc/iptables/rules.v4
+ip6tables-restore < /etc/iptables/rules.v6
+
 /vagrant/provisioning/provision.sh

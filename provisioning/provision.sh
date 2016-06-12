@@ -48,13 +48,6 @@ echo "** Install elasticdump **"
 npm install elasticdump -g
 
 
-echo "** Initializing Firewall **"
-mkdir /etc/iptables
-cp -R $DIR/etc/iptables/* /etc/iptables/
-iptables-restore < /etc/iptables/rules.v4
-ip6tables-restore < /etc/iptables/rules.v6
-
-
 # Install Oracle Java
 echo "** Install OracleJDK **"
 cd /tmp

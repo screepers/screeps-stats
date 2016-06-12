@@ -6,7 +6,7 @@ pwd
 
 apt_quiet_install () {
    echo "** Install package $1 **"
-   apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f install $1
+   DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f -q install $1
 }
 
 
@@ -27,13 +27,12 @@ echo 'deb-src https://deb.nodesource.com/node_6.x wily main' >> /etc/apt/sources
 # Upgrade System
 echo "** Upgrade System **"
 apt-get update
-apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f dist-upgrade
+DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f dist-upgrade
 
 
 # Install Development Tools
 echo "** Install Development Tools **"
 apt_quiet_install git
-apt_quiet_install iptables-persistent
 apt_quiet_install nodejs
 apt_quiet_install npm
 apt_quiet_install python-dev

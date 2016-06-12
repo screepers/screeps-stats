@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+PROVISIONING_DIR='/vagrant/provisioning'
+
 echo "** Adding Apt Mirrors **"
 echo "$(echo deb mirror://mirrors.ubuntu.com/mirrors.txt wily main restricted universe multiverse | cat - /etc/apt/sources.list)" > /etc/apt/sources.list
 echo "$(echo deb mirror://mirrors.ubuntu.com/mirrors.txt wily-updates main restricted universe multiverse | cat - /etc/apt/sources.list)" > /etc/apt/sources.list
@@ -16,17 +18,18 @@ sysctl -p
 
 echo "** Initializing Firewall **"
 mkdir /etc/iptables
-cp -R $DIR/etc/iptables/* /etc/iptables/
+cp -R $PROVISIONING_DIR/etc/iptables/* /etc/iptables/
 iptables-restore < /etc/iptables/rules.v4
 ip6tables-restore < /etc/iptables/rules.v6
+echo iptables-persistent iptables-persistent/autosave_v4 boolean false | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean false | debconf-set-selections
+apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f -q iptables-persistent
 
-/vagrant/provisioning/provision.sh
 
+$PROVISIONING_DIR/provision.sh
 
 echo "** Install nginx **"
-apt_quiet_install nginx
-apt_quiet_install apache2-utils
+apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f -q install nginx apache2-utils
 echo 'screepsstats' | htpasswd -i -c /etc/nginx/htpasswd.users kibanaadmin
-cp $DIR/etc/nginx/sites-available/default /etc/nginx/sites-available/default
+cp $PROVISIONING_DIR/etc/nginx/sites-available/default /etc/nginx/sites-available/default
 service nginx restart
-

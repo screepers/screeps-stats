@@ -21,10 +21,11 @@ if [ ! -f $ENV ]; then
     exit -1
 fi
 
-SCRIPT="$DIR/../screeps_etl/statsrunner.py"
+SCRIPT="$DIR/../screeps_etl/screepsstats.py"
 
 if (( "$EUID" == 0 )); then
   su - $USER -s /bin/bash -c "source $ENV; $SCRIPT $@"
 else
+  source $ENV
   $SCRIPT "$@"
 fi

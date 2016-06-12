@@ -3,7 +3,6 @@
 from console import ScreepsConsole
 from memorystats import ScreepsMemoryStats
 
-from daemon import runner
 import logging
 import multiprocessing
 import os
@@ -83,5 +82,4 @@ class APIProcess(multiprocessing.Process):
 
 if __name__ == "__main__":
     app = App()
-    daemon_runner = runner.DaemonRunner(app)
-    daemon_runner.do_action()
+    app.run()

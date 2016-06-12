@@ -110,6 +110,6 @@ make install
 
 if [ -f "$DIR/../.screeps_settings.yaml" ]; then
   echo "** Settings Found: Launching Stats Daemon **"
-  screeps_stats.sh start
+  systemctl start screepsstats.service
 fi
 

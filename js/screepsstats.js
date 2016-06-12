@@ -262,8 +262,19 @@ ScreepsStats.prototype.roomExpensive = function (stats, room) {
 }
 
 ScreepsStats.prototype.removeTick = function (tick) {
+
+  if(Array.isArray(tick)) {
+    for(var index in tick) {
+      this.removeTick(tick[index])
+    }
+    return 'ScreepStats: Processed ' + tick.length + ' ticks'
+  }
+
   if(!!Memory.___screeps_stats[tick]) {
     delete Memory.___screeps_stats[tick]
+    return 'ScreepStats: Removed tick ' + tick
+  } else {
+    return 'ScreepStats: tick ' + tick + ' was not present to remove'
   }
 }
 

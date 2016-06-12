@@ -23,9 +23,9 @@ install:
 
 	# Move service file into place- note that symlinks will not work (bug 955379)
 	if [ -d /etc/systemd/system ]; then \
-		cp $(ROOT_DIR)/provisioning/etc/systemd/system/screepsstats.service /etc/systemd/system/screepsstats.service \
-		systemctl enable screepsstats.service
-		systemctl start screepsstats.service
+		cp $(ROOT_DIR)/provisioning/etc/systemd/system/screepsstats.service /etc/systemd/system/screepsstats.service; \
+		systemctl enable screepsstats.service; \
+		systemctl start screepsstats.service; \
 	fi;
 
 dependencies:
@@ -48,8 +48,8 @@ uninstall:
 	fi;
 	# Shut down, disbale, and remove all services.
 	if [ -L /etc/systemd/system/screepsstats.service ]; then \
-		systemctl disable screepsstats.service \
-		systemctl stop screepsstats.service \
+		systemctl disable screepsstats.service; \
+		systemctl stop screepsstats.service; \
 		rm /etc/systemd/system/screepsstats.service; \
 	fi;
 

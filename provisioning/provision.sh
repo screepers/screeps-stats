@@ -68,7 +68,7 @@ cd $DIR
 
 # Install ElasticSearch
 apt_quiet_install elasticsearch
-cp $DIR/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+cp $DIR/etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 update-rc.d elasticsearch defaults 95 10
 service elasticsearch start
 
@@ -77,11 +77,11 @@ service elasticsearch start
 apt_quiet_install kibana
 
 mkdir /etc/kibana
-cp $DIR/kibana.yml /etc/kibana/kibana.yml
+cp $DIR/etc/kibana/kibana.yml /etc/kibana/kibana.yml
 update-rc.d kibana defaults 96 9
 
 echo "** Load Kibana Indexes **"
-$DIR/import_kibana_indexes.sh
+$DIR/bin/import_kibana_indexes.sh
 
 echo "** Install Kibana Plugins **"
 /opt/kibana/bin/kibana plugin -i elastic/timelion
@@ -96,7 +96,7 @@ service kibana start
 apt_quiet_install nginx
 apt_quiet_install apache2-utils
 echo 'screepsstats' | htpasswd -i -c /etc/nginx/htpasswd.users kibanaadmin
-cp $DIR/default /etc/nginx/sites-available/default
+cp $DIR/etc/nginx/sites-available/default /etc/nginx/sites-available/default
 service nginx restart
 
 

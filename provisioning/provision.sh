@@ -100,13 +100,13 @@ source ./env/bin/activate
 yes w | pip install --upgrade -r requirements.txt
 
 
-# Setup 'screeps_stats.sh' in the system path
-echo "** Installing screeps_stats.sh into System Path **"
-ln -s $DIR/../bin/screeps_stats.sh /usr/local/bin/screeps_stats.sh
+echo "** make screeps-stats project **"
+cd $DIR/../
+make
 
 
-echo "** Creating screepsstats user **"
-useradd screepsstats --create-home --shell /bin/false -U
+echo "** install screeps-stats project **"
+make install
 
 
 if [ -f "$DIR/../.screeps_settings.yaml" ]; then

@@ -21,3 +21,12 @@ iptables-restore < /etc/iptables/rules.v4
 ip6tables-restore < /etc/iptables/rules.v6
 
 /vagrant/provisioning/provision.sh
+
+
+echo "** Install nginx **"
+apt_quiet_install nginx
+apt_quiet_install apache2-utils
+echo 'screepsstats' | htpasswd -i -c /etc/nginx/htpasswd.users kibanaadmin
+cp $DIR/etc/nginx/sites-available/default /etc/nginx/sites-available/default
+service nginx restart
+

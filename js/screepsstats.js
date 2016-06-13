@@ -53,6 +53,7 @@ ScreepsStats.prototype.addStat = function (key, value) {
 
 ScreepsStats.prototype.runBuiltinStats = function () {
 
+  this.clean()
   stats = {}
   stats.time = new Date().toISOString()
   stats.tick = Game.time

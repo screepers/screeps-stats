@@ -55,7 +55,7 @@ For servers without systemd the `screepsstatsctl` service manager has been provi
 to it's own user).
 
 
-## Enhances Screeps Stats Collection
+## Enhanced Screeps Stats Collection
 
 By default this service will ingest the console and performance data (cpu and memory size).
 

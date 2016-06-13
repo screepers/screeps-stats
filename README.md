@@ -35,7 +35,7 @@ robust. This is the recommended setup for long term installations.
 ElasticSearch can be installed however you wish, but a provisioning script for ElasticSearch and
 Kibana is provided.
 
-1. Download - `wget $(curl -L -s https://api.github.com/repos/tedivm/stash/releases/latest | grep tarball_url | head -n 1 | cut -d '"' -f 4) -O screepsstats.tgz`
+1. Download - `wget $(curl -L -s https://api.github.com/repos/screepers/stascreeps-stats/releases/latest | grep tarball_url | head -n 1 | cut -d '"' -f 4) -O screepsstats.tgz`
 2. Unpack - `mkdir screepsstats; tar zxvf screepsstats.tgz -C ./screepsstats --strip 1`.
 3. Move - `sudo mv screepsstats /opt/screepsstats`.
 4. Change Directory - `cd /opt/screepsstats`

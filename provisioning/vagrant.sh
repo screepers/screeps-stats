@@ -16,6 +16,13 @@ echo "net.ipv6.conf.default.disable_ipv6 = 1" | tee -a /etc/sysctl.conf
 echo "net.ipv6.conf.lo.disable_ipv6 = 1" | tee -a /etc/sysctl.conf
 sysctl -p
 
+
+# Upgrade System
+echo "** Upgrade System **"
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f dist-upgrade
+
+
 echo "** Initializing Firewall **"
 mkdir /etc/iptables
 cp -R $PROVISIONING_DIR/etc/iptables/* /etc/iptables/

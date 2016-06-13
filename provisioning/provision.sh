@@ -23,11 +23,7 @@ wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 echo 'deb https://deb.nodesource.com/node_6.x wily main' > /etc/apt/sources.list.d/nodesource.list
 echo 'deb-src https://deb.nodesource.com/node_6.x wily main' >> /etc/apt/sources.list.d/nodesource.list
 
-
-# Upgrade System
-echo "** Upgrade System **"
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -f dist-upgrade
 
 
 # Install Development Tools

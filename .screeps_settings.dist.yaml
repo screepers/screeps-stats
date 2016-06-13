@@ -1,0 +1,6 @@
+# Copy this to .screeps_settings.yaml and fill it out.
+
+# Screeps account info
+screeps_username: 'email@domain.tld'
+screeps_password: 'YourPasswordHere!'
+screeps_ptr: false

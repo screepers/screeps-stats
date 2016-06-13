@@ -81,3 +81,13 @@ to 20 ticks, at which point the oldest data will be removed.
 
 It's important for the `ScreepsStats` class to get assigned to `global.Stats`, as the stats collection server will
 use this class to delete ticks that it has finished processing.
+
+
+## Enhanced Console Attributes
+
+This module uses the console attribute system defined in the [Screeps Console](https://github.com/screepers/screeps_console)
+project. By adding additional tags like `severity`, `group`, and `tick`, developers can sort and filter their console data
+to drill down into issue.
+
+You can start with the [ExampleLogger](https://github.com/screepers/screeps_console/blob/master/docs/ExampleLogger.js) in
+that project as a replacement for `console.log` to immediately take advantage of this.

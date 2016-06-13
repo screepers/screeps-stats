@@ -87,14 +87,6 @@ echo "** Start Kibana **"
 service kibana start
 
 
-# Activate VirtualEnvironment and install dependencies
-echo "** Create VirtualENV and Install Dependencies **"
-cd $DIR/../
-virtualenv env
-source ./env/bin/activate
-yes w | pip install --upgrade -r requirements.txt
-
-
 echo "** make screeps-stats project **"
 cd $DIR/../
 make
@@ -102,10 +94,4 @@ make
 
 echo "** install screeps-stats project **"
 make install
-
-
-if [ -f "$DIR/../.screeps_settings.yaml" ]; then
-  echo "** Settings Found: Launching Stats Daemon **"
-  systemctl start screepsstats.service
-fi
 

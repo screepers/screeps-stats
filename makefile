@@ -30,7 +30,7 @@ install:
 
 dependencies:
 	if [ ! -d $(ROOT_DIR)/env ]; then virtualenv $(ROOT_DIR)/env; fi
-	source $(ROOT_DIR)/env/bin/activate; pip install -r $(ROOT_DIR)/requirements.txt
+	source $(ROOT_DIR)/env/bin/activate; yes w | pip install -r $(ROOT_DIR)/requirements.txt
 
 uninstall:
 	# Remove user and home.

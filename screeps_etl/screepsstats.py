@@ -13,7 +13,6 @@ import threading
 import time
 
 
-base_directory = '/tmp/screepsstats'
 base_directory = os.path.expanduser('~')
 if not os.path.exists(base_directory):
     os.makedirs(base_directory)

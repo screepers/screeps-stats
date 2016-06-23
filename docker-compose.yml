@@ -2,6 +2,8 @@ version: '2'
 services:
     elasticsearch:
         image: elasticsearch
+        volumes:
+            - ./esdata:/usr/share/elasticsearch/data
     kibana:
         image: kibana
         ports:

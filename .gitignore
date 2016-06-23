@@ -2,6 +2,7 @@
 .screeps_settings.yaml
 .vagrant
 src
+esdata
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

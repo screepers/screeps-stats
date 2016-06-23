@@ -124,13 +124,13 @@ ScreepsStats.prototype.runBuiltinStats = function () {
             }
           }
 
-          stats['storage'][room.terminal.id] = {}
-          stats['storage'][room.terminal.id].room = room.name
-          stats['storage'][room.terminal.id].store = _.sum(room.storage.store)
-          stats['storage'][room.terminal.id]['resources'] = {}
+          stats['storage'][room.storage.id] = {}
+          stats['storage'][room.storage.id].room = room.name
+          stats['storage'][room.storage.id].store = _.sum(room.storage.store)
+          stats['storage'][room.storage.id]['resources'] = {}
           for(var resourceType in room.storage.store) {
-            stats['storage'][room.terminal.id]['resources'][resourceType] = room.storage.store[resourceType]
-            stats['storage'][room.terminal.id][resourceType] = room.storage.store[resourceType]
+            stats['storage'][room.storage.id]['resources'][resourceType] = room.storage.store[resourceType]
+            stats['storage'][room.storage.id][resourceType] = room.storage.store[resourceType]
           }
         }
 

@@ -11,7 +11,7 @@ import os
 
 class ScreepsMemoryStats():
 
-    ELASTICSEARCH_HOST = os.environ['ELASTICSEARCH_PORT_9200_TCP_ADDR'] or 'localhost'
+    ELASTICSEARCH_HOST = 'elasticsearch' if 'ELASTICSEARCH' in os.environ else 'localhost'
     es = Elasticsearch([ELASTICSEARCH_HOST])
 
     def __init__(self, u=None, p=None, ptr=False):

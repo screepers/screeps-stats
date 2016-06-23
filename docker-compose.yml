@@ -1,0 +1,15 @@
+version: '2'
+services:
+    elasticsearch:
+        image: elasticsearch
+    kibana:
+        image: kibana
+        ports:
+            - "5601:5601"
+        links:
+            - elasticsearch
+    screeps-stats:
+        build: .
+        links:
+            - elasticsearch:elasticsearch
+        entrypoint: wait-for-it/wait-for-it.sh -t 30 elasticsearch:9200 -- python screeps_etl/screepsstats.py

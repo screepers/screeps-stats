@@ -7,10 +7,12 @@ import screepsapi
 from settings import getSettings
 import six
 import time
+import os
 
 class ScreepsMemoryStats():
 
-    es = Elasticsearch()
+    ELASTICSEARCH_HOST = os.environ['ELASTICSEARCH_PORT_9200_TCP_ADDR'] or 'localhost'
+    es = Elasticsearch([ELASTICSEARCH_HOST])
 
     def __init__(self, u=None, p=None, ptr=False):
         self.user = u

@@ -7,13 +7,15 @@ import screepsapi
 from settings import getSettings
 import sys
 import time
+import os
 
 ## Python before 2.7.10 or so has somewhat broken SSL support that throws a warning; suppress it
 import warnings; warnings.filterwarnings('ignore', message='.*true sslcontext object.*')
 
 class ScreepsConsole(screepsapi.Socket):
 
-    es = Elasticsearch()
+    ELASTICSEARCH_HOST = os.environ['ELASTICSEARCH_PORT_9200_TCP_ADDR'] or 'localhost'
+    es = Elasticsearch([ELASTICSEARCH_HOST])
 
     def set_subscriptions(self):
         self.subscribe_user('console')

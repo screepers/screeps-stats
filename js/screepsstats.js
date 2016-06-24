@@ -1,16 +1,11 @@
-
 var ScreepsStats = function () {
   if(!Memory.___screeps_stats) {
     Memory.___screeps_stats = {}
   }
-
-  if(!!Game.structures.length > 0) {
-    this.username = Game.structures[0].owner.username
-  } else if (Game.creeps.length > 0) {
-    this.username = Game.creeps[0].owner.username
-  } else {
-    this.username = false
-  }
+  this.username = _.get(
+    _.find(Game.structures,(s) => true),'owner.username',
+    _.get(_.find(Game.creeps,(s) => true),'owner.username')
+  ) || false
   this.clean()
 }
 
@@ -26,9 +21,7 @@ ScreepsStats.prototype.clean = function () {
 }
 
 ScreepsStats.prototype.addStat = function (key, value) {
-
   // Key is in format 'parent.child.grandchild.greatgrantchild.etc'
-
   var key_split = key.split('.')
 
   if(key_split.length == 1) {
@@ -36,7 +29,7 @@ ScreepsStats.prototype.addStat = function (key, value) {
     return
   }
 
-  start = Memory.___screeps_stats[Game.time][key_split[0]]
+  var start = Memory.___screeps_stats[Game.time][key_split[0]]
 
   var tmp = {}
   for (var i=0,n=key_split.length; i<n; i++){
@@ -54,212 +47,183 @@ ScreepsStats.prototype.addStat = function (key, value) {
 ScreepsStats.prototype.runBuiltinStats = function () {
 
   this.clean()
-  stats = {}
-  stats.time = new Date().toISOString()
-  stats.tick = Game.time
-
-  stats['cpu'] = {
-    'limit': Game.cpu.limit,
-    'tickLimit': Game.cpu.tickLimit,
-    'bucket': Game.cpu.bucket
-  }
-
-  stats['gcl'] = {
-    'level': Game.gcl.level,
-    'progress': Game.gcl.progress,
-    'progressTotal': Game.gcl.progressTotal
-  }
-
-  if(!stats['rooms']) {
-    stats['rooms'] = {
-      'subgroups': true
+  var stats = {
+    time: new Date().toISOString(),
+    tick: Game.time,
+    cpu: {
+      limit: Game.cpu.limit,
+      tickLimit: Game.cpu.tickLimit,
+      bucket: Game.cpu.bucket
+    },
+    gcl: {
+     level: Game.gcl.level,
+     progress: Game.gcl.progress,
+     progressTotal: Game.gcl.progressTotal
     }
   }
 
+  _.defaults(stats, {
+    rooms: {
+      subgroups: true
+    }
+  })
 
-  for(var roomName in Game.rooms) {
-    var room = Game.rooms[roomName]
+  _.forEach(Game.rooms,(room) => {
 
-    if(!stats[roomName]) {
-      stats['rooms'][roomName] = {}
+    if(!stats[room.name]) {
+      stats.rooms[room.name] = {}
     }
 
-    if(!!room.controller) {
-      var controller = room.controller
+    if (_.isEmpty(room.controller)) { return }
+    var controller = room.controller
 
-      // Is hostile room? Continue
-      if(!controller.my) {
-        if(!!controller.owner) { // Owner is set but is not this user.
-          if(controller.owner.username != this.username) {
-            continue
+    // Is hostile room? Continue
+    if(!controller.my) {
+      if(!!controller.owner) { // Owner is set but is not this user.
+        if(controller.owner.username != this.username) {
+          return
+        }
+      }
+    }
+
+    // Controller
+    _.merge(stats.rooms[room.name], {
+      level: controller.level,
+      progress: controller.progress,
+      upgradeBlocked: controller.upgradeBlocked,
+      reservation: _.get(controller,'reservation.ticksToEnd'),
+      ticksToDowngrade: controller.ticksToDowngrade
+    })
+
+    if(controller.level > 0) {
+
+      // Room
+      _.merge(stats.rooms[room.name],{
+        energyAvailable: room.energyAvailable,
+        energyCapacityAvailable: room.energyCapacityAvailable,
+      })
+
+      // Storage
+      if(room.storage) {
+        _.defaults(stats, {
+          storage: {
+            subgroups: true
           }
+        })
+        stats.storage[room.storage.id] = {
+          room: room.name,
+          store: _.sum(room.storage.store),
+          resources: {}
+        }
+        for(var resourceType in room.storage.store) {
+          stats.storage[room.storage.id].resources[resourceType] = room.storage.store[resourceType]
+          stats.storage[room.storage.id][resourceType] = room.storage.store[resourceType]
         }
       }
 
-      // Collect stats
-      stats['rooms'][roomName]['level'] = controller.level
-      stats['rooms'][roomName]['progress'] = controller.progress
-
-      if(!!controller.upgradeBlocked) {
-        stats['rooms'][roomName]['upgradeBlocked'] = controller.upgradeBlocked
-      }
-
-      if(!!controller.reservation) {
-        stats['rooms'][roomName]['reservation'] = controller.reservation.ticksToEnd
-      }
-
-      if(!!controller.ticksToDowngrade) {
-        stats['rooms'][roomName]['ticksToDowngrade'] = controller.ticksToDowngrade
-      }
-
-      if(controller.level > 0) {
-
-        stats['rooms'][roomName]['energyAvailable'] = room.energyAvailable
-        stats['rooms'][roomName]['energyAvailable'] = room.energyCapacityAvailable
-
-        if(room.storage) {
-          if(!stats['storage']) {
-            stats['storage'] = {
-              'subgroups': true
-            }
+      // Terminals
+      if(room.terminal) {
+        _.defaults(stats, {
+          terminal: {
+            subgroups: true
           }
-
-          stats['storage'][room.storage.id] = {}
-          stats['storage'][room.storage.id].room = room.name
-          stats['storage'][room.storage.id].store = _.sum(room.storage.store)
-          stats['storage'][room.storage.id]['resources'] = {}
-          for(var resourceType in room.storage.store) {
-            stats['storage'][room.storage.id]['resources'][resourceType] = room.storage.store[resourceType]
-            stats['storage'][room.storage.id][resourceType] = room.storage.store[resourceType]
-          }
+        })
+        stats.terminal[room.terminal.id] = {
+          room: room.name,
+          store: _.sum(room.terminal.store),
+          resources: {}
         }
-
-        if(room.terminal) {
-
-          if(!stats['terminal']) {
-            stats['terminal'] = {
-              'subgroups': true
-            }
-          }
-
-          stats['terminal'][room.terminal.id] = {}
-          stats['terminal'][room.terminal.id].room = room.name
-          stats['terminal'][room.terminal.id].store = _.sum(room.terminal.store)
-          stats['terminal'][room.terminal.id]['resources'] = {}
-          for(var resourceType in room.terminal.store) {
-            stats['terminal'][room.terminal.id]['resources'][resourceType] = room.terminal.store[resourceType]
-            stats['terminal'][room.terminal.id][resourceType] = room.terminal.store[resourceType]
-          }
+        for(var resourceType in room.terminal.store) {
+          stats.terminal[room.terminal.id].resources[resourceType] = room.terminal.store[resourceType]
+          stats.terminal[room.terminal.id][resourceType] = room.terminal.store[resourceType]
         }
       }
+
     }
 
     this.roomExpensive(stats,room)
-  }
+  })
 
-  if(!stats['spawns']) {
-    stats['spawns'] = {
-      'subgroups': true
+  // Spawns
+  _.defaults(stats, {
+    spawns: {
+      subgroups: true
     }
-  }
-
-  for(var i in Game.spawns) {
-    var spawn = Game.spawns[i]
-    stats['spawns'][spawn.name] = {}
-    stats['spawns'][spawn.name].room = spawn.room.name
-    if(!!spawn.spawning) {
-      stats['spawns'][spawn.name].busy = true
-      stats['spawns'][spawn.name].remainingTime = spawn.spawning.remainingTime
-    } else {
-      stats['spawns'][spawn.name].busy = false
-      stats['spawns'][spawn.name].remainingTime = 0
+  })
+  _.forEach(Game.spawns, function(spawn) {
+    stats.spawns[spawn.name] = {
+      room: spawn.room.name,
+      busy: !!spawn.spawning,
+      remainingTime: _.get(spawn,'spawning.remainingTime',0)
     }
-  }
+  })
 
   Memory.___screeps_stats[Game.time] = stats
 }
 
 ScreepsStats.prototype.roomExpensive = function (stats, room) {
 
-  var roomName = room.name
-
-
   // Source Mining
-
-  if(!stats['sources']) {
-    stats['sources'] = {
-      'subgroups': true
+  _.defaults(stats, {
+    sources: {
+      subgroups: true
+    },
+    minerals: {
+      subgroups: true
     }
-  }
+  })
 
-  if(!stats['minerals']) {
-    stats['minerals'] = {
-      'subgroups': true
-    }
-  }
-
-  stats['rooms'][roomName].spawnEnergy = 0
-  stats['rooms'][roomName].spawnEnergyMax = 0
-
-  stats['rooms'][roomName].mineral = 0
-  stats['rooms'][roomName].mineralCapacity = 0
-
-
-
+  stats.rooms[room.name].sources = {}
   var sources = room.find(FIND_SOURCES)
-  stats['rooms'][roomName]['sources'] = {}
-  for(var source_index in sources) {
-    var source = sources[source_index]
-    stats['sources'][source.id] = {}
-    stats['sources'][source.id].room = roomName
-    stats['sources'][source.id].energy = source.energy
-    stats['sources'][source.id].energyCapacity = source.energyCapacity
-    stats['sources'][source.id].ticksToRegeneration = source.ticksToRegeneration
 
+  _.forEach(sources,(source) => {
+    stats.sources[source.id] = {
+      room: room.name,
+      energy: source.energy,
+      energyCapacity: source.energyCapacity,
+      ticksToRegeneration: source.ticksToRegeneration
+    }
     if(source.energy < source.energyCapacity && source.ticksToRegeneration) {
       var energyHarvested = source.energyCapacity - source.energy
       if(source.ticksToRegeneration < ENERGY_REGEN_TIME) {
         var ticksHarvested = ENERGY_REGEN_TIME - source.ticksToRegeneration
-        stats['sources'][source.id].averageHarvest = energyHarvested / ticksHarvested
+        stats.sources[source.id].averageHarvest = energyHarvested / ticksHarvested
       }
     } else {
-      stats['sources'][source.id].averageHarvest = 0
+      stats.sources[source.id].averageHarvest = 0
     }
 
-    stats['rooms'][roomName].energy += source.energy
-    stats['rooms'][roomName].energyCapacity += source.energyCapacity
-  }
+    stats.rooms[room.name].energy += source.energy
+    stats.rooms[room.name].energyCapacity += source.energyCapacity
+  })
 
   // Mineral Mining
   var minerals = room.find(FIND_MINERALS)
-  stats['rooms'][roomName]['minerals'] = {}
-  for(var minerals_index in minerals) {
-    var mineral = minerals[minerals_index]
-    stats['minerals'][mineral.id] = {}
-    stats['minerals'][mineral.id].room = roomName
-    stats['minerals'][mineral.id].mineralType = mineral.mineralType
-    stats['minerals'][mineral.id].mineralAmount = mineral.mineralAmount
-    stats['minerals'][mineral.id].ticksToRegeneration = mineral.ticksToRegeneration
-
-    stats['rooms'][roomName].mineralAmount += mineral.mineralAmount
-    stats['rooms'][roomName].mineralType += mineral.mineralType
-  }
-
+  stats.rooms[room.name].minerals = {}
+  _.forEach(minerals,(mineral) => {
+    stats.minerals[mineral.id] = {
+      room: room.name,
+      mineralType: mineral.mineralType,
+      mineralAmount: mineral.mineralAmount,
+      ticksToRegeneration: mineral.ticksToRegeneration
+    }
+    stats.rooms[room.name].mineralAmount += mineral.mineralAmount
+    stats.rooms[room.name].mineralType += mineral.mineralType
+  })
 
   // Hostiles in Room
   var hostiles = room.find(FIND_HOSTILE_CREEPS)
-  stats['rooms'][roomName]['hostiles'] = {}
-  for(var hostile_index in hostiles){
-    var hostile = hostiles[hostile_index]
-    if(!stats['rooms'][roomName]['hostiles'][hostile.owner.username]) {
-      stats['rooms'][roomName]['hostiles'][hostile.owner.username] = 1
+  stats.rooms[room.name].hostiles = {}
+  _.forEach(hostiles,(hostile) => {
+    if(!stats.rooms[room.name].hostiles[hostile.owner.username]) {
+      stats.rooms[room.name].hostiles[hostile.owner.username] = 1
     } else {
-      stats['rooms'][roomName]['hostiles'][hostile.owner.username]++
+      stats.rooms[room.name].hostiles[hostile.owner.username]++
     }
-  }
+  })
 
   // My Creeps
-  stats['rooms'][roomName]['creeps'] = room.find(FIND_MY_CREEPS).length
+  stats.rooms[room.name]['creeps'] = room.find(FIND_MY_CREEPS).length
 }
 
 ScreepsStats.prototype.removeTick = function (tick) {

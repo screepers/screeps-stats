@@ -76,7 +76,7 @@ module.exports.loop = function () {
 ```
 
 When the stats collection service picks stats up from the server it will erase them, so as long as the service is
-running only a few ticks with of data will be stored. If the stats service fails. Stats will be collected for up
+running only a few ticks worth of data will be stored. If the stats service fails. Stats will be collected for up
 to 20 ticks, at which point the oldest data will be removed.
 
 It's important for the `ScreepsStats` class to get assigned to `global.Stats`, as the stats collection server will

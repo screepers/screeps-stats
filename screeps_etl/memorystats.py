@@ -39,7 +39,7 @@ class ScreepsMemoryStats():
 
         # stats[tick][group][subgroup][data]
         # stats[4233][rooms][W43S94] = {}
-        date_index = time.strftime("%Y_%d")
+        date_index = time.strftime("%Y_%m")
         confirm_queue =[]
         for tick,tickstats in stats['data'].items():
             for group,groupstats in tickstats.items():

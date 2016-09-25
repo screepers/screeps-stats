@@ -11,7 +11,7 @@ PyYAML==3.11
 requests==2.10.0
 requests[security]
 Requires==0.0.3
--e git+https://github.com/screepers/python-screeps.git@ed864201a5427cafb8c2988b3891a45f7b99bfa4#egg=screepsapi
+-e git+https://github.com/screepers/python-screeps.git@23fd0fcb65b3f96eb16e3137901f356074fd5882#egg=screepsapi
 six==1.10.0
 urllib3==1.15.1
 websocket-client==0.37.0

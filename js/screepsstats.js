@@ -21,27 +21,11 @@ ScreepsStats.prototype.clean = function () {
 }
 
 ScreepsStats.prototype.addStat = function (key, value) {
-  // Key is in format 'parent.child.grandchild.greatgrantchild.etc'
-  var key_split = key.split('.')
-
-  if(key_split.length == 1) {
-    Memory.___screeps_stats[Game.time][key_split[0]] = value
-    return
+  if(!Memory.___screeps_stats[Game.time]) {
+    Memory.___screeps_stats[Game.time] = {}
   }
 
-  var start = Memory.___screeps_stats[Game.time][key_split[0]]
-
-  var tmp = {}
-  for (var i=0,n=key_split.length; i<n; i++){
-    if(i == (n-1)) {
-      tmp[arr[i]]=value;
-    } else {
-      tmp[arr[i]]={};
-      tmp = tmp[arr[i]];
-    }
-  }
-
-  _.merge(start = Memory.___screeps_stats[Game.time], tmp)
+  _.set(Memory.___screeps_stats[Game.time], key, value)
 }
 
 ScreepsStats.prototype.runBuiltinStats = function () {
@@ -56,9 +40,13 @@ ScreepsStats.prototype.runBuiltinStats = function () {
       bucket: Game.cpu.bucket
     },
     gcl: {
-     level: Game.gcl.level,
-     progress: Game.gcl.progress,
-     progressTotal: Game.gcl.progressTotal
+      level: Game.gcl.level,
+      progress: Game.gcl.progress,
+      progressTotal: Game.gcl.progressTotal
+    },
+    market : {
+      'credits': Game.market.credits,
+      'orders': Game.market.orders.length
     }
   }
 
@@ -83,6 +71,8 @@ ScreepsStats.prototype.runBuiltinStats = function () {
         if(controller.owner.username != this.username) {
           return
         }
+      } else {
+        return
       }
     }
 
@@ -141,7 +131,9 @@ ScreepsStats.prototype.runBuiltinStats = function () {
 
     }
 
-    this.roomExpensive(stats,room)
+    if(Game.time % 10 == 0) {
+      this.roomExpensive(stats, room)
+    }
   })
 
   // Spawns
@@ -158,7 +150,11 @@ ScreepsStats.prototype.runBuiltinStats = function () {
     }
   })
 
-  Memory.___screeps_stats[Game.time] = stats
+  if(!Memory.___screeps_stats[Game.time]) {
+    Memory.___screeps_stats[Game.time] = stats
+  } else {
+    _.merge(Memory.___screeps_stats[Game.time], stats)
+  }
 }
 
 ScreepsStats.prototype.roomExpensive = function (stats, room) {

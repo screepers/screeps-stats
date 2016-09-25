@@ -9,12 +9,14 @@ var ScreepsStats = function () {
   this.clean()
 }
 
+ScreepsStats.prototype.limit = 10
+
 ScreepsStats.prototype.clean = function () {
   var recorded = Object.keys(Memory.___screeps_stats)
-  if(recorded.length > 20) {
+  if (recorded.length > this.limit) {
     recorded.sort()
-    var limit = recorded.length - 20
-    for(var i = 0; i < limit; i++) {
+    var limit = recorded.length - this.limit
+    for (var i = 0; i < limit; i++) {
       this.removeTick(recorded[i])
     }
   }

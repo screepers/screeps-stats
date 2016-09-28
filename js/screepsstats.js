@@ -135,7 +135,7 @@ ScreepsStats.prototype.runBuiltinStats = function () {
 
     }
 
-    if(Game.time % 10 == 0) {
+    if(!!controller.my && Game.time % 10 == 0) {
       this.roomExpensive(stats, room)
     }
   })

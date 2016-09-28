@@ -3,6 +3,8 @@ Description=Screeps Statistics Collection
 After=network-online.target
 
 [Service]
+Restart=always
+RestartSec=5
 Type=simple
 User=screepsstats
 Group=screepsstats

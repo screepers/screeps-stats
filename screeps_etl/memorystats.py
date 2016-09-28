@@ -29,7 +29,7 @@ class ScreepsMemoryStats():
     def run_forever(self):
         while True:
             self.run()
-            time.sleep(3)
+            time.sleep(5)
 
     def run(self):
         screeps = self.getScreepsAPI()

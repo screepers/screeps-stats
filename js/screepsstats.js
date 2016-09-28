@@ -263,9 +263,4 @@ ScreepsStats.prototype.getStatsForTick = function (tick) {
   }
 }
 
-if (ENABLE_PROFILER && !!Profiler) {
-  ScreepsStats.prototype = Profiler.registerObject(ScreepsStats, 'ScreepsStats')
-}
-
-
 module.exports = ScreepsStats

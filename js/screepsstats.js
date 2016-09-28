@@ -22,12 +22,16 @@ ScreepsStats.prototype.clean = function () {
   }
 }
 
-ScreepsStats.prototype.addStat = function (key, value) {
+ScreepsStats.prototype.addStat = function (key, value, subgroups = false) {
   if(!Memory.___screeps_stats[Game.time]) {
     Memory.___screeps_stats[Game.time] = {}
   }
 
   _.set(Memory.___screeps_stats[Game.time], key, value)
+  if(subgroups) {
+    var keySplit = key.split('.')
+    Memory.___screeps_stats[Game.time][keySplit[0]]['subgroups'] = true
+  }
 }
 
 ScreepsStats.prototype.runBuiltinStats = function () {

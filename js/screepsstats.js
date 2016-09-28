@@ -9,7 +9,7 @@ var ScreepsStats = function () {
   this.clean()
 }
 
-ScreepsStats.prototype.limit = 10
+ScreepsStats.prototype.limit = 7
 
 ScreepsStats.prototype.clean = function () {
   var recorded = Object.keys(Memory.___screeps_stats)

@@ -59,10 +59,6 @@ class ScreepsConsole(screepsapi.Socket):
 
         message_text = message_soup.get_text()
 
-        if ':' in message_text:
-            parts = message_text.partition(':')
-            message_text = parts[2]
-
         message_text.strip()
         body['message'] = message_text.replace("\t", ' ')
         res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)

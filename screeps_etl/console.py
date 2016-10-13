@@ -65,7 +65,7 @@ class ScreepsConsole(screepsapi.Socket):
 
         message_text.strip()
         body['message'] = message_text.replace("\t", ' ')
-        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
+        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%m"), doc_type="log", body=body)
 
     def process_results(self, ws, message):
         body = {
@@ -73,7 +73,7 @@ class ScreepsConsole(screepsapi.Socket):
             'message': message,
             'mtype': 'results'
         }
-        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
+        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%m"), doc_type="log", body=body)
 
     def process_error(self, ws, message):
         body = {
@@ -82,7 +82,7 @@ class ScreepsConsole(screepsapi.Socket):
             'mtype': 'error',
             'severity': 5
         }
-        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%d"), doc_type="log", body=body)
+        res = self.es.index(index="screeps-console-" + time.strftime("%Y_%m"), doc_type="log", body=body)
 
     def process_cpu(self, ws, data):
         body = {
@@ -96,7 +96,7 @@ class ScreepsConsole(screepsapi.Socket):
             body['memory'] = data['memory']
 
         if 'cpu' in data or 'memory' in data:
-            res = self.es.index(index="screeps-performance-" + time.strftime("%Y_%d"), doc_type="performance", body=body)
+            res = self.es.index(index="screeps-performance-" + time.strftime("%Y_%m"), doc_type="performance", body=body)
 
 
 if __name__ == "__main__":

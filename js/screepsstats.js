@@ -251,15 +251,15 @@ ScreepsStats.prototype.getStats = function (json) {
   if (json) {
     return JSON.stringify(Memory.___screeps_stats)
   } else {
-    return Memory.__screeps_stats
+    return Memory.___screeps_stats
   }
 }
 
 ScreepsStats.prototype.getStatsForTick = function (tick) {
-  if (!Memory.__screeps_stats[tick]) {
+  if (!Memory.___screeps_stats[tick]) {
     return false
   } else {
-    return Memory.__screeps_stats[tick]
+    return Memory.___screeps_stats[tick]
   }
 }
 

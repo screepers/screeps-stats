@@ -48,7 +48,7 @@ Kibana is provided.
 ### Manage Service
 
 If you are using an operating system with SystemD this service will be installed when you run `make install`.
-From there it can be managed with the systemctl tool (`systemctl start screepstats.service`).
+From there it can be managed with the systemctl tool (`systemctl start screepsstats.service`).
 
 For servers without systemd the `screepsstatsctl` service manager has been provided. It takes the commands
 `start`, `stop`, and `reset`. For security reasons this should be run as root (it will downgrade itself

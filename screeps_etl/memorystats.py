@@ -28,10 +28,63 @@ class ScreepsMemoryStats():
 
     def run_forever(self):
         while True:
-            self.run()
+            self.collectMemoryStats()
+            self.collectMarketHistory()
             time.sleep(5)
 
-    def run(self):
+    def collectMarketHistory(self):
+        screeps = self.getScreepsAPI()
+        market_history = screeps.market_history()
+
+        if 'list' not in market_history:
+            return
+
+        for item in market_history['list']:
+            item['id'] = item['_id']
+            del item['_id']
+            if item['type'] == 'market.fee':
+                if 'extendOrder' in item['market']:
+                    item['addAmount'] = item['market']['extendOrder']['addAmount']
+                else:
+                    item['orderType'] = item['market']['order']['type']
+                    item['resourceType'] = item['market']['order']['resourceType']
+                    item['price'] = item['market']['order']['price']
+                    item['totalAmount'] = item['market']['order']['totalAmount']
+                    item['roomName'] = item['market']['order']['roomName']
+                self.saveFee(item)
+            else:
+                item['resourceType'] = item['market']['resourceType']
+                item['price'] = item['market']['price']
+                item['totalAmount'] = item['market']['amount']
+                item['roomName'] = item['market']['roomName']
+                item['targetRoomName'] = item['market']['targetRoomName']
+                item['npc'] = item['market']['npc']
+                self.saveOrder(item)
+
+    def saveFee(self, order):
+        date_index = time.strftime("%Y_%m")
+        indexname = 'screeps-market-fees_' + date_index
+        if not self.es.exists(index=indexname, doc_type="orders", id=order['id']):
+            self.es.index(index=indexname,
+                          doc_type="fees",
+                          id=order['id'],
+                          timestamp=order['date'],
+                          body=order)
+
+    def saveOrder(self, order):
+        date_index = time.strftime("%Y_%m")
+        indexname = 'screeps-market-orders_' + date_index
+
+        if not self.es.exists(index=indexname, doc_type="orders", id=order['id']):
+            self.es.index(index=indexname,
+                          doc_type="orders",
+                          id=order['id'],
+                          timestamp=order['date'],
+                          body=order)
+
+
+
+    def collectMemoryStats(self):
         screeps = self.getScreepsAPI()
         stats = screeps.memory(path='___screeps_stats')
         if 'data' not in stats:

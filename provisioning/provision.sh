@@ -15,8 +15,9 @@ echo "** Add Package Manager Repositories **"
 
 # elasticsearch and kibana repositories repository
 wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list.d/elasticsearch-2.x.list
-echo "deb http://packages.elastic.co/kibana/4.4/debian stable main" | tee -a /etc/apt/sources.list.d/kibana-4.4.x.list
+echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+
+
 
 # Node repository
 wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -

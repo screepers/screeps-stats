@@ -45,12 +45,14 @@ class ScreepsMemoryStats():
             if item['type'] == 'market.fee':
                 if 'extendOrder' in item['market']:
                     item['addAmount'] = item['market']['extendOrder']['addAmount']
-                else:
+                elif 'order' in item['market']:
                     item['orderType'] = item['market']['order']['type']
                     item['resourceType'] = item['market']['order']['resourceType']
                     item['price'] = item['market']['order']['price']
                     item['totalAmount'] = item['market']['order']['totalAmount']
                     item['roomName'] = item['market']['order']['roomName']
+                else:
+                    continue
                 self.saveFee(item)
             else:
                 item['resourceType'] = item['market']['resourceType']

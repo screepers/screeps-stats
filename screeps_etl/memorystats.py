@@ -58,9 +58,14 @@ class ScreepsMemoryStats():
                 item['resourceType'] = item['market']['resourceType']
                 item['price'] = item['market']['price']
                 item['totalAmount'] = item['market']['amount']
-                item['roomName'] = item['market']['roomName']
-                item['targetRoomName'] = item['market']['targetRoomName']
-                item['npc'] = item['market']['npc']
+                if 'roomName' in item['market']:
+                    item['roomName'] = item['market']['roomName']
+                if 'targetRoomName' in item['market']:
+                    item['targetRoomName'] = item['market']['targetRoomName']
+                if 'npc' in item['market']:
+                    item['npc'] = item['market']['npc']
+                else:
+                    item['npc'] = False
                 self.saveOrder(item)
 
     def saveFee(self, order):

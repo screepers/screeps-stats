@@ -40,7 +40,7 @@ Kibana is provided.
 3. Move - `sudo mv screepsstats /opt/screepsstats`.
 4. Change Directory - `cd /opt/screepsstats`
 5. OPTIONAL: Provision ElasticSearch and Kibana `sudo ./provisioning/provision.sh`.
-6. Configure - `cp .screeps_settings.dist.yaml .screeps_settings.yaml` and then edit.
+6. Configure - `cp .screeps_settings.dist.yaml ~screepsstats/.screeps_settings.yaml` and then edit.
 7. Build - `make`
 8. Install - `sudo make install`
 

@@ -11,6 +11,7 @@ import os
 
 class ScreepsMemoryStats():
 
+    lasttick = 0
     ELASTICSEARCH_HOST = 'elasticsearch' if 'ELASTICSEARCH' in os.environ else 'localhost'
     es = Elasticsearch([ELASTICSEARCH_HOST])
 
@@ -102,6 +103,10 @@ class ScreepsMemoryStats():
         date_index = time.strftime("%Y_%m")
         confirm_queue =[]
         for tick,tickstats in stats['data'].items():
+            if int(tick) <= self.lasttick:
+                continue
+
+            self.lasttick = int(tick)
             for group,groupstats in tickstats.items():
 
                 indexname = 'screeps-stats-' + group + '_' + date_index

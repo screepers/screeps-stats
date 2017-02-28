@@ -119,13 +119,15 @@ class ScreepsMemoryStats():
                             continue
 
                         statdata[group] = subgroup
-                        statdata['tick'] = int(tick)
-                        statdata['timestamp'] = tickstats['time']
-                        res = self.es.index(index=indexname, doc_type="stats", body=statdata)
+                        savedata = self.clean(statdata)
+                        savedata['tick'] = int(tick)
+                        savedata['timestamp'] = tickstats['time']
+                        res = self.es.index(index=indexname, doc_type="stats", body=savedata)
                 else:
-                    groupstats['tick'] = int(tick)
-                    groupstats['timestamp'] = tickstats['time']
-                    res = self.es.index(index=indexname, doc_type="stats", body=groupstats)
+                    savedata = self.clean(groupstats)
+                    savedata['tick'] = int(tick)
+                    savedata['timestamp'] = tickstats['time']
+                    res = self.es.index(index=indexname, doc_type="stats", body=savedata)
             confirm_queue.append(tick)
 
         self.confirm(confirm_queue)
@@ -134,6 +136,15 @@ class ScreepsMemoryStats():
         javascript_clear = 'Stats.removeTick(' + json.dumps(ticks, separators=(',',':')) + ');'
         sconn = self.getScreepsAPI()
         sconn.console(javascript_clear)
+
+    def clean(self, datadict):
+        newdict = {}
+        for key, value in datadict.iteritems():
+            try:
+                newdict[key] = float(value)
+            except ValueError:
+                newdict[key] = value
+        return datadict
 
 
 if __name__ == "__main__":

@@ -30,7 +30,7 @@ class ScreepsMemoryStats():
     def run_forever(self):
         while True:
             self.collectMemoryStats()
-            #self.collectMarketHistory()
+            self.collectMarketHistory()
             time.sleep(5)
 
     def collectMarketHistory(self):

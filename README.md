@@ -9,9 +9,12 @@ be provisioned using the supplied vagrant file.
 
 * Full console output is saved in a quickly searchable database.
 * Performance data- such as CPU and Memory usage- is saved and charted over time.
+* Personal market history is pulled from the API without any game code changes.
 * Provided "screepsstats.js" module can be added to game code in order to collect more statistics.
 * Custom statistics can be easily added using screepsstats module.
 * Statistics are buffered, reducing needed API calls and ensuring data isn't lost for minor issues (server restarts, internet issues).
+* Utilizes segments to store data, preventing it from being continually parsed when Memory is loaded.
+* Falls back to Memory when segments are unavailable.
 
 
 ## Quick Start with Vagrant
@@ -72,6 +75,10 @@ module.exports.loop = function () {
 
   // Run Stats Last.
   Stats.runBuiltinStats()
+
+  // Optional: Move stats from this tick out of memory
+  // and into one of the passed segments.
+  Stats.manageSegments([50,51,52,53,54])
 }
 ```
 

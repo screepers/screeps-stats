@@ -11,7 +11,6 @@ import os
 
 class ScreepsMemoryStats():
 
-    lasttick = 0
     ELASTICSEARCH_HOST = 'elasticsearch' if 'ELASTICSEARCH' in os.environ else 'localhost'
     es = Elasticsearch([ELASTICSEARCH_HOST])
 
@@ -19,6 +18,7 @@ class ScreepsMemoryStats():
         self.user = u
         self.password = p
         self.ptr = ptr
+        self.processed_ticks = []
 
     def getScreepsAPI(self):
         if not self.__api:
@@ -30,7 +30,7 @@ class ScreepsMemoryStats():
     def run_forever(self):
         while True:
             self.collectMemoryStats()
-            self.collectMarketHistory()
+            #self.collectMarketHistory()
             time.sleep(5)
 
     def collectMarketHistory(self):
@@ -102,12 +102,31 @@ class ScreepsMemoryStats():
         # stats[4233][rooms][W43S94] = {}
         date_index = time.strftime("%Y_%m")
         confirm_queue =[]
-        for tick,tickstats in stats['data'].items():
-            if int(tick) <= self.lasttick:
+        for tick,tick_index in stats['data'].items():
+            if int(tick) in self.processed_ticks:
                 continue
 
-            self.lasttick = int(tick)
-            for group,groupstats in tickstats.items():
+            # Is tick_index a list of segments or the data itself?
+            if isinstance(tick_index, list):
+                rawstring = ''
+                for segment_id in tick_index:
+                    segment = screeps.get_segment(segment=int(segment_id))
+                    if 'data' in segment and len(segment['data']) > 1:
+                        rawstring = segment['data']
+                    else:
+                        # Segment may not be ready yet - try again next run.
+                        return
+                try:
+                    tickstats = json.loads(rawstring)
+                except:
+                    continue
+            else:
+                tickstats = tick_index
+
+            self.processed_ticks.append(int(tick))
+            if len(self.processed_ticks) > 20:
+                self.processed_ticks.pop(0)
+            for group, groupstats in tickstats.items():
 
                 indexname = 'screeps-stats-' + group + '_' + date_index
                 if not isinstance(groupstats, dict):
@@ -122,12 +141,12 @@ class ScreepsMemoryStats():
                         savedata = self.clean(statdata)
                         savedata['tick'] = int(tick)
                         savedata['timestamp'] = tickstats['time']
-                        res = self.es.index(index=indexname, doc_type="stats", body=savedata)
+                        self.es.index(index=indexname, doc_type="stats", body=savedata)
                 else:
                     savedata = self.clean(groupstats)
                     savedata['tick'] = int(tick)
                     savedata['timestamp'] = tickstats['time']
-                    res = self.es.index(index=indexname, doc_type="stats", body=savedata)
+                    self.es.index(index=indexname, doc_type="stats", body=savedata)
             confirm_queue.append(tick)
 
         self.confirm(confirm_queue)
@@ -142,7 +161,7 @@ class ScreepsMemoryStats():
         for key, value in datadict.iteritems():
             try:
                 newdict[key] = float(value)
-            except ValueError:
+            except:
                 newdict[key] = value
         return datadict
 

@@ -263,4 +263,42 @@ ScreepsStats.prototype.getStatsForTick = function (tick) {
   }
 }
 
+ScreepsStats.prototype.manageSegments = function (allowedSegments=false) {
+  if(!allowedSegments || allowedSegments.length <= 0 ) {
+    return
+  }
+  if(!Memory.___screeps_stats[Game.time]) {
+    return
+  }
+  try {
+    var current_data = _.values(Memory.___screeps_stats).reduce(function(acc, val){return _.unique(acc.concat(_.values(val)))}, [])
+    var unused_segments = _.filter(allowedSegments, function(id){
+      return current_data.indexOf(id) < 0
+    })
+    var segid = unused_segments[0]
+    var json = JSON.stringify(Memory.___screeps_stats[Game.time])
+
+    var maxmemory = 100*1024
+
+    var needed_segments = Math.ceil(json.length/maxmemory)
+    if(unused_segments.length < needed_segments) {
+      return
+    }
+
+    var ids = []
+    for(var i = 0; i<needed_segments; i++) {
+      var segid = unused_segments.pop()
+      ids.push(segid)
+      var start = i * maxmemory
+      var end = start + maxmemory // will end *one before* this value
+      var chunk = json.slice(start, end)
+      RawMemory.segments[segid] = chunk
+    }
+
+    Memory.___screeps_stats[Game.time] = ids
+  } catch (err) {
+    throw err
+  }
+}
+
 module.exports = ScreepsStats

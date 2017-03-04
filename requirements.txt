@@ -1,4 +1,5 @@
 backports.ssl-match-hostname==3.5.0.1
+Beaker==1.7.0
 beautifulsoup4==4.4.1
 docutils==0.12
 elasticsearch==2.3.0

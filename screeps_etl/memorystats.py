@@ -72,8 +72,8 @@ class ScreepsMemoryStats():
                         alliance = screeps_service.getAllianceFromUser(user)
                         if alliance:
                             item['alliance'] = alliance
-                    
-                    if 'npc' in item['market']:
+
+                if 'npc' in item['market']:
                     item['npc'] = item['market']['npc']
                 else:
                     item['npc'] = False

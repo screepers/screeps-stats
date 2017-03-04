@@ -8,6 +8,8 @@ from settings import getSettings
 import six
 import time
 import os
+import services.screeps as screeps_service
+
 
 class ScreepsMemoryStats():
 
@@ -61,6 +63,15 @@ class ScreepsMemoryStats():
                 item['totalAmount'] = item['market']['amount']
                 if 'roomName' in item['market']:
                     item['roomName'] = item['market']['roomName']
+
+                    user = screeps_service.getRoomOwner(item['roomName'])
+                    if user:
+                        item['player'] = user
+                        alliance = screeps_service.getAllianceFromUser(user)
+                        if alliance:
+                            item['alliance'] = alliance
+
+
                 if 'targetRoomName' in item['market']:
                     item['targetRoomName'] = item['market']['targetRoomName']
                 if 'npc' in item['market']:

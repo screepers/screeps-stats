@@ -14,6 +14,8 @@ ScreepsStats.prototype.resourceCheck = 50
 ScreepsStats.prototype.resourceCheckOffset = -4
 ScreepsStats.prototype.expensiveStatsCheck = 10
 ScreepsStats.prototype.expensiveStatsCheckOffset = 3
+ScreepsStats.prototype.stringifyBuffer = 180
+
 
 ScreepsStats.prototype.clean = function () {
   var recorded = Object.keys(Memory.___screeps_stats)
@@ -324,6 +326,11 @@ ScreepsStats.prototype.manageSegments = function (allowedSegments=false) {
   if(!Memory.___screeps_stats[Game.time]) {
     return
   }
+
+  if(Game.cpu.tickLimit - Game.cpu.getUsed() < this.stringifyBuffer) {
+    return
+  }
+
   try {
     var current_data = _.values(Memory.___screeps_stats).reduce(function(acc, val){return _.unique(acc.concat(_.values(val)))}, [])
     var unused_segments = _.filter(allowedSegments, function(id){

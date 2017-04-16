@@ -10,6 +10,10 @@ var ScreepsStats = function () {
 }
 
 ScreepsStats.prototype.limit = 7
+ScreepsStats.prototype.resourceCheck = 50
+ScreepsStats.prototype.resourceCheckOffset = -4
+ScreepsStats.prototype.expensiveStatsCheck = 10
+ScreepsStats.prototype.expensiveStatsCheckOffset = 3
 
 ScreepsStats.prototype.clean = function () {
   var recorded = Object.keys(Memory.___screeps_stats)
@@ -48,11 +52,21 @@ ScreepsStats.prototype.runBuiltinStats = function () {
     gcl: {
       level: Game.gcl.level,
       progress: Game.gcl.progress,
-      progressTotal: Game.gcl.progressTotal
+      progressTotal: Game.gcl.progressTotal,
+      remaining: Game.gcl.progressTotal - Game.gcl.progress
+    },
+    creeps: {
+      count: Object.keys(Game.creeps).length
     },
     market : {
       'credits': Game.market.credits,
       'orders': Game.market.orders.length
+    },
+    resources: {
+      subgroups: true
+    },
+    resources_total: {
+      subgroups: true
     }
   }
 
@@ -63,10 +77,6 @@ ScreepsStats.prototype.runBuiltinStats = function () {
   })
 
   _.forEach(Game.rooms, (room) => {
-
-    if (!stats[room.name]) {
-      stats.rooms[room.name] = {}
-    }
 
     if (_.isEmpty(room.controller)) {
       return
@@ -82,6 +92,10 @@ ScreepsStats.prototype.runBuiltinStats = function () {
       } else {
         return
       }
+    }
+
+    if (!stats[room.name]) {
+      stats.rooms[room.name] = {}
     }
 
     // Controller
@@ -101,46 +115,86 @@ ScreepsStats.prototype.runBuiltinStats = function () {
         energyCapacityAvailable: room.energyCapacityAvailable,
       })
 
-      // Storage
-      if (room.storage) {
-        _.defaults(stats, {
-          storage: {
-            subgroups: true
-          }
-        })
-        stats.storage[room.storage.id] = {
-          room: room.name,
-          store: _.sum(room.storage.store),
-          resources: {}
-        }
-        for (var resourceType in room.storage.store) {
-          stats.storage[room.storage.id].resources[resourceType] = room.storage.store[resourceType]
-          stats.storage[room.storage.id][resourceType] = room.storage.store[resourceType]
-        }
-      }
 
-      // Terminals
-      if (room.terminal) {
-        _.defaults(stats, {
-          terminal: {
-            subgroups: true
+      if((Game.time + this.resourceCheckOffset) % this.resourceCheck == 0) {
+        // Storage
+        if (room.storage) {
+          _.defaults(stats, {
+            storage: {
+              subgroups: true
+            }
+          })
+          stats.storage[room.storage.id] = {
+            room: room.name,
+            store: _.sum(room.storage.store),
+            resources: {}
           }
-        })
-        stats.terminal[room.terminal.id] = {
-          room: room.name,
-          store: _.sum(room.terminal.store),
-          resources: {}
+          for (var resourceType in room.storage.store) {
+
+            stats.resources[room.storage.id + resourceType] = {
+              resourceType: resourceType,
+              resourceAmount: room.storage.store[resourceType],
+              room: room.name,
+              structure: STRUCTURE_STORAGE
+            }
+
+            if(!stats['resources_total'][resourceType]) {
+              stats['resources_total'][resourceType] = {
+                resourceType: resourceType,
+                resourceAmount: room.storage.store[resourceType],
+              }
+            } else {
+              stats['resources_total'][resourceType]['resourceAmount'] += room.storage.store[resourceType]
+            }
+
+
+            stats.storage[room.storage.id].resources[resourceType] = room.storage.store[resourceType]
+            stats.storage[room.storage.id][resourceType] = room.storage.store[resourceType]
+          }
         }
-        for (var resourceType in room.terminal.store) {
-          stats.terminal[room.terminal.id].resources[resourceType] = room.terminal.store[resourceType]
-          stats.terminal[room.terminal.id][resourceType] = room.terminal.store[resourceType]
+
+        // Terminals
+        if (room.terminal) {
+          _.defaults(stats, {
+            terminal: {
+              subgroups: true
+            }
+          })
+          stats.terminal[room.terminal.id] = {
+            room: room.name,
+            store: _.sum(room.terminal.store),
+            resources: {}
+          }
+          for (var resourceType in room.terminal.store) {
+
+            stats.resources[room.terminal.id + resourceType] = {
+              resourceType: resourceType,
+              resourceAmount: room.terminal.store[resourceType],
+              room: room.name,
+              structure: STRUCTURE_TERMINAL
+            }
+
+            if(!stats['resources_total'][resourceType]) {
+              stats['resources_total'][resourceType] = {
+                resourceType: resourceType,
+                resourceAmount: room.terminal.store[resourceType],
+              }
+            } else {
+              stats['resources_total'][resourceType]['resourceAmount'] += room.terminal.store[resourceType]
+            }
+
+            stats.terminal[room.terminal.id].resources[resourceType] = room.terminal.store[resourceType]
+            stats.terminal[room.terminal.id][resourceType] = room.terminal.store[resourceType]
+          }
         }
       }
 
     }
 
-    if(!!controller.my && Game.time % 10 == 0) {
-      this.roomExpensive(stats, room)
+    if (!!controller.my) {
+      if((Game.time + this.expensiveStatsCheckOffset) % this.expensiveStatsCheck == 0) {
+        this.roomExpensive(stats, room)
+      }
     }
   })
 

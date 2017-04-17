@@ -62,7 +62,7 @@ ScreepsStats.prototype.runBuiltinStats = function () {
     },
     market : {
       'credits': Game.market.credits,
-      'orders': Game.market.orders.length
+      'orders': Object.keys(Game.market.orders).length
     },
     resources: {
       subgroups: true

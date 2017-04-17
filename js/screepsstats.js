@@ -9,7 +9,7 @@ var ScreepsStats = function () {
   this.clean()
 }
 
-ScreepsStats.prototype.limit = 7
+ScreepsStats.prototype.limit = 10
 ScreepsStats.prototype.resourceCheck = 50
 ScreepsStats.prototype.resourceCheckOffset = -4
 ScreepsStats.prototype.expensiveStatsCheck = 10

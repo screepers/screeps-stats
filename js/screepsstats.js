@@ -346,6 +346,10 @@ ScreepsStats.prototype.manageSegments = function (allowedSegments=false) {
       return
     }
 
+    if ((10-Object.keys(RawMemory.segments).length) < needed_segments) {
+      return
+    }
+    
     var ids = []
     for(var i = 0; i<needed_segments; i++) {
       var segid = unused_segments.pop()

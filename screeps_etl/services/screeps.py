@@ -16,7 +16,7 @@ def getScreepsAPI():
 def getRoomOwner(room):
     screeps = getScreepsAPI()
     room_overview = screeps.room_overview(room)
-    if 'owner' in room_overview:
+    if 'owner' in room_overview and room_overview['owner'] is not None:
         if 'username' in room_overview['owner']:
             return room_overview['owner']['username']
     return False

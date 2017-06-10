@@ -21,8 +21,8 @@ echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee 
 
 # Node repository
 wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
-echo 'deb https://deb.nodesource.com/node_6.x wily main' > /etc/apt/sources.list.d/nodesource.list
-echo 'deb-src https://deb.nodesource.com/node_6.x wily main' >> /etc/apt/sources.list.d/nodesource.list
+echo 'deb https://deb.nodesource.com/node_6.x xenial main' > /etc/apt/sources.list.d/nodesource.list
+echo 'deb-src https://deb.nodesource.com/node_6.x xenial main' >> /etc/apt/sources.list.d/nodesource.list
 
 apt-get update
 
@@ -49,15 +49,9 @@ echo "** Install elasticdump **"
 npm install elasticdump -g
 
 
-# Install Oracle Java
-echo "** Install OracleJDK **"
-cd /tmp
-wget -nv --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u92-b14/jdk-8u92-linux-x64.tar.gz
-mkdir /opt/jdk
-tar -zxf jdk-8u92-linux-x64.tar.gz -C /opt/jdk
-rm jdk-8u92-linux-x64.tar.gz
-update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.0_92/bin/java 100
-update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.0_92/bin/javac 100
+# Install OpenJDK Java
+echo "** Install OpenJDK **"
+apt-get install --yes openjdk-8-jre-headless
 cd $DIR
 
 
@@ -80,9 +74,7 @@ echo "** Load Kibana Indexes **"
 $DIR/bin/import_kibana_indexes.sh
 
 echo "** Install Kibana Plugins **"
-/opt/kibana/bin/kibana plugin -i elastic/timelion
-/opt/kibana/bin/kibana plugin -i tagcloud -u https://github.com/stormpython/tagcloud/archive/master.zip
-chown -R kibana:kibana /opt/kibana
+chown -R kibana:kibana /usr/share/kibana
 
 echo "** Start Kibana **"
 service kibana start

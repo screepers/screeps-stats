@@ -3,10 +3,6 @@
 PROVISIONING_DIR='/vagrant/provisioning'
 
 echo "** Adding Apt Mirrors **"
-echo "$(echo deb mirror://mirrors.ubuntu.com/mirrors.txt wily main restricted universe multiverse | cat - /etc/apt/sources.list)" > /etc/apt/sources.list
-echo "$(echo deb mirror://mirrors.ubuntu.com/mirrors.txt wily-updates main restricted universe multiverse | cat - /etc/apt/sources.list)" > /etc/apt/sources.list
-echo "$(echo deb mirror://mirrors.ubuntu.com/mirrors.txt wily-backports main restricted universe multiverse | cat - /etc/apt/sources.list)" > /etc/apt/sources.list
-echo "$(echo deb mirror://mirrors.ubuntu.com/mirrors.txt wily-security main restricted universe multiverse | cat - /etc/apt/sources.list)" > /etc/apt/sources.list
 
 echo "** Disabling IPv6 **"
 echo 'precedence ::ffff:0:0/96 100' >> /etc/gai.conf

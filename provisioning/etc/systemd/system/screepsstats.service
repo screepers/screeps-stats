@@ -13,6 +13,7 @@ ExecStart=/usr/local/bin/screepsstats
 StandardOutput=syslog
 StandardError=syslog
 Restart=always
+Environment=PYTHONUNBUFFERED=true
 
 [Install]
 WantedBy=multi-user.target

@@ -23,7 +23,7 @@ class ScreepsMemoryStats():
         self.user = u
         self.password = p
         self.ptr = ptr
-        self.processed_ticks = []
+        self.processed_ticks = {}
 
     def getScreepsAPI(self):
         if not self.__api:
@@ -36,27 +36,37 @@ class ScreepsMemoryStats():
         lastrun = False
         while True:
 
-            self.collectMemoryStats()
+            api = self.getScreepsAPI()
+            try:
+                shard_data = api.shard_info()['shards']
+                shards = [x['name'] for x in shard_data]
+                if len(shards) < 1:
+                    shards = ['shard0']
+            except:
+                shards = ['shard0']
 
-            # Market data changes much more rarely so process it less often.
-            if not lastrun or lastrun >= 20:
-                self.collectMarketHistory()
-                lastrun = 1
-                # don't pause before next run as market collection adds its own
-                # delays
-                continue
+            for shard in shards:
+                self.collectMemoryStats(shard)
+
+                # Market data changes much more rarely so process it less often.
+                if not lastrun or lastrun >= 20:
+                    self.collectMarketHistory(shard)
+                    lastrun = 1
+                    # don't pause before next run as market collection adds its own
+                    # delays
+                    continue
 
             lastrun += 1
             time.sleep(7)
 
-    def collectMarketHistory(self):
+    def collectMarketHistory(self, shard):
         screeps = self.getScreepsAPI()
         page = None
         failures = 0
 
         while True:
 
-            market_history = screeps.market_history(page)
+            market_history = screeps.market_history(page, shard)
 
             if 'list' not in market_history:
                 return
@@ -66,6 +76,7 @@ class ScreepsMemoryStats():
                     continue
 
                 item['id'] = item['_id']
+                item['shard'] = shard
                 del item['_id']
                 if item['type'] == 'market.fee':
                     if 'extendOrder' in item['market']:
@@ -168,18 +179,21 @@ class ScreepsMemoryStats():
             return True
 
 
-    def collectMemoryStats(self):
+    def collectMemoryStats(self, shard):
         screeps = self.getScreepsAPI()
         stats = screeps.memory(path='___screeps_stats')
         if 'data' not in stats:
             return False
+
+        if shard not in self.processed_ticks:
+            self.processed_ticks[shard] = []
 
         # stats[tick][group][subgroup][data]
         # stats[4233][rooms][W43S94] = {}
         date_index = time.strftime("%Y_%m")
         confirm_queue =[]
         for tick,tick_index in stats['data'].items():
-            if int(tick) in self.processed_ticks:
+            if int(tick) in self.processed_ticks[shard]:
                 continue
 
             # Is tick_index a list of segments or the data itself?
@@ -199,9 +213,9 @@ class ScreepsMemoryStats():
             else:
                 tickstats = tick_index
 
-            self.processed_ticks.append(int(tick))
-            if len(self.processed_ticks) > 20:
-                self.processed_ticks.pop(0)
+            self.processed_ticks[shard].append(int(tick))
+            if len(self.processed_ticks[shard]) > 100:
+                self.processed_ticks[shard].pop(0)
             for group, groupstats in tickstats.items():
 
                 indexname = 'screeps-stats-' + group + '_' + date_index
@@ -217,20 +231,22 @@ class ScreepsMemoryStats():
                         savedata = self.clean(statdata)
                         savedata['tick'] = int(tick)
                         savedata['timestamp'] = tickstats['time']
+                        savedata['shard'] = shard
                         self.es.index(index=indexname, doc_type="stats", body=savedata)
                 else:
                     savedata = self.clean(groupstats)
                     savedata['tick'] = int(tick)
                     savedata['timestamp'] = tickstats['time']
+                    savedata['shard'] = shard
                     self.es.index(index=indexname, doc_type="stats", body=savedata)
             confirm_queue.append(tick)
 
         self.confirm(confirm_queue)
 
-    def confirm(self, ticks):
+    def confirm(self, ticks, shard):
         javascript_clear = 'Stats.removeTick(' + json.dumps(ticks, separators=(',',':')) + ');'
         sconn = self.getScreepsAPI()
-        sconn.console(javascript_clear)
+        sconn.console(javascript_clear, shard)
 
     def clean(self, datadict):
         newdict = {}
